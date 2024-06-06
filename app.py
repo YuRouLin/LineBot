@@ -1,28 +1,28 @@
 from flask import Flask, request, abort
-from linebot import (
-    LineBotApi, WebhookHandler
-)
-from linebot.exceptions import (
-    InvalidSignatureError
-)
-from linebot.models import *
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, MemberJoinedEvent
+import os
 
 app = Flask(__name__)
 
 # Channel Access Token
-line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')
+line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
 # Channel Secret
-handler = WebhookHandler('YOUR_CHANNEL_SECRET')
+handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
+
+# 用户状态字典，用来存储每个用户的状态
+user_state = {}
 
 questions_answers = {
-        '台數': {
-            "莊家": "1台",
-            "莊連一": "3台",
-            "莊連二": "5台",
-            "莊連三": "7台",
-            "莊連四": "9台",
-            "莊連五": "2N+1，N是連莊數，答案是11台，連六以後依此類推",
-            "三元牌": "1台",
+    '台數': {
+        "莊家": "1台",
+        "莊連一": "3台",
+        "莊連二": "5台",
+        "莊連三": "7台",
+        "莊連四": "9台",
+        "莊連五": "2N+1，N是連莊數，答案是11台，連六以後依此類推",
+        "三元牌": "1台",
             "四風牌": "1台",
             "三暗刻": "2台",
             "四暗刻": "5台",
@@ -98,8 +98,6 @@ questions_answers = {
         }
 }
 
-user_state = {}
-
 @app.route("/callback", methods=['POST'])
 def callback():
     signature = request.headers['X-Line-Signature']
@@ -111,14 +109,15 @@ def callback():
         abort(400)
     return 'OK'
 
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_id = event.source.user_id
     msg = event.message.text.strip()
-    
+
     if user_id not in user_state:
         user_state[user_id] = None
-    
+
     if msg == '牌型的台數或定義':
         line_bot_api.reply_message(event.reply_token, TextSendMessage("想查詢台數還是定義?"))
     elif msg == '台數':
@@ -135,5 +134,16 @@ def handle_message(event):
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage("未找到相關答案，請重新輸入相對應的關鍵字"))
 
+@handler.add(MemberJoinedEvent)
+def welcome(event):
+    uid = event.joined.members[0].user_id
+    gid = event.source.group_id
+    profile = line_bot_api.get_group_member_profile(gid, uid)
+    name = profile.display_name
+    message = TextSendMessage(text=f'{name}歡迎加入')
+    line_bot_api.reply_message(event.reply_token, message)
+
+
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
