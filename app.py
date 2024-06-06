@@ -133,16 +133,16 @@ def handle_message(event):
     msg = event.message.text.strip()
     
     if user_id not in user_state:
-         user_state[user_id] = None
+        user_state[user_id] = None
     
     if msg == '牌型的台數或定義':
         line_bot_api.reply_message(event.reply_token, TextSendMessage("想查詢台數還是定義?"))
     elif msg == '台數':
-         user_state[user_id] = '台數'
-         line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型台數"))
+        user_state[user_id] = '台數'
+        line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型台數"))
     elif msg == '定義':
         user_state[user_id] = '定義'
-         line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型定義"))
+        line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型定義"))
      else:
         current_state = user_state[user_id]
         if current_state and msg in questions_answers[current_state]:
