@@ -143,7 +143,7 @@ def handle_message(event):
     elif msg == '定義':
         user_state[user_id] = '定義'
         line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型定義"))
-     else:
+    else:
         current_state = user_state[user_id]
         if current_state and msg in questions_answers[current_state]:
             reply = questions_answers[current_state][msg]
