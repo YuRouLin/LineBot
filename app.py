@@ -123,6 +123,7 @@ def handle_message(event):
             "海底撈月": "海底前最後一張而自摸。",
             "槓上開花": "因家槓、暗槓、摸到花牌而補牌，補牌後又剛好胡牌。",
             "搶槓胡": "當對手加槓時，加槓的那一張牌剛好是胡牌者所要胡的牌，胡牌者可以選擇搶槓胡牌，視為加槓者放槍。",
+        }
     }
     if msg in questions_answers:
         #print(f"{english_word} 的中文翻譯是：{words_dict[english_word]}")
