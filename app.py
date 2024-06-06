@@ -135,7 +135,7 @@ def handle_message(event):
     
         if msg == '牌型的台數或定義':
             line_bot_api.reply_message(event.reply_token, TextSendMessage("想查詢台數還是定義?"))
-        elif msg == '球員':
+        elif msg == '台數':
             user_state[user_id] = '台數'
             line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型台數"))
         elif msg == '定義':
