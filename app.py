@@ -125,29 +125,31 @@ def handle_message(event):
             "搶槓胡": "當對手加槓時，加槓的那一張牌剛好是胡牌者所要胡的牌，胡牌者可以選擇搶槓胡牌，視為加槓者放槍。",
         }
     }
-    @handler.add(MessageEvent, message=TextMessage)
-    def handle_message(event):
-        user_id = event.source.user_id
-        msg = event.message.text.strip()
     
-        if user_id not in user_state:
-            user_state[user_id] = None
     
-        if msg == '牌型的台數或定義':
-            line_bot_api.reply_message(event.reply_token, TextSendMessage("想查詢台數還是定義?"))
-        elif msg == '台數':
-            user_state[user_id] = '台數'
-            line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型台數"))
-        elif msg == '定義':
-            user_state[user_id] = '定義'
-            line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型定義"))
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    user_id = event.source.user_id
+    msg = event.message.text.strip()
+    
+    if user_id not in user_state:
+         user_state[user_id] = None
+    
+    if msg == '牌型的台數或定義':
+        line_bot_api.reply_message(event.reply_token, TextSendMessage("想查詢台數還是定義?"))
+    elif msg == '台數':
+         user_state[user_id] = '台數'
+         line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型台數"))
+    elif msg == '定義':
+        user_state[user_id] = '定義'
+         line_bot_api.reply_message(event.reply_token, TextSendMessage("請輸入想查詢的牌型定義"))
+     else:
+        current_state = user_state[user_id]
+        if current_state and msg in questions_answers[current_state]:
+            reply = questions_answers[current_state][msg]
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(reply))
         else:
-            current_state = user_state[user_id]
-            if current_state and msg in questions_answers[current_state]:
-                reply = questions_answers[current_state][msg]
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(reply))
-            else:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage("未找到相關答案，請重新輸入相對應的關鍵字"))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage("未找到相關答案，請重新輸入相對應的關鍵字"))
 
        
          
